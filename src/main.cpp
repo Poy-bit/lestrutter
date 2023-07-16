@@ -6,11 +6,7 @@
 
 #include <string>
 #include "shader.h"
-
-using namespace glm;
-
-const float WIN_WIDTH = 800;
-const float WIN_HEIGHT = 600;
+#include "camera.h"
 
 int main(int argc, char* argv[]) {
 	SDL_Init(SDL_INIT_VIDEO); // TODO: Add to tests
@@ -22,7 +18,7 @@ int main(int argc, char* argv[]) {
 	SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
-	SDL_Window* window = SDL_CreateWindow("Lestrutter", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WIN_WIDTH, WIN_HEIGHT, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
+	SDL_Window* window = SDL_CreateWindow("Lestrutter", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
 
 	SDL_GLContext gl_context = SDL_GL_CreateContext(window); // TODO: Add to tests
 	SDL_GL_MakeCurrent(window, gl_context);
@@ -52,11 +48,7 @@ int main(int argc, char* argv[]) {
 	shader mainShader = shader(SOURCE_PATH+std::string("/res/shaders/vert.txt"), SOURCE_PATH+std::string("/res/shaders/frag.txt"));
 	mainShader.bind();
 
-	vec2 origin = {0, 0};
-	vec2 origin_campos = { 0, 0 };
-	vec2 campos = {0, 0};
-
-	bool pressed = false;
+	camera theCamera;
 
 	SDL_Event e;
 	bool quit = false;
@@ -65,21 +57,18 @@ int main(int argc, char* argv[]) {
 			switch (e.type) {
 			case (SDL_QUIT): { quit = true; break; }
 			case (SDL_MOUSEBUTTONDOWN): {
-				origin = { e.button.x / (WIN_WIDTH/2)-1, 1-e.button.y / (WIN_HEIGHT/2)-1 };
-				pressed = true;  break;
+				theCamera.mousedown_ev(e.button); break;
 			} case (SDL_MOUSEBUTTONUP): {
-				origin_campos = campos;
-				pressed = false;  break;
+				theCamera.mouseup_ev(e.button);  break;
 			} case (SDL_MOUSEMOTION): {
-				if (pressed) {
-					vec2 rel_pos = vec2(e.motion.x / (WIN_WIDTH / 2) - 1, 1-e.motion.y / (WIN_HEIGHT / 2) - 1);
-					campos = origin_campos + (rel_pos - origin); }
+				theCamera.mousemove_ev(e.motion);  break;
+			} case (SDL_MOUSEWHEEL): {
+				theCamera.mousewheel_ev(e.wheel); break;
 			}
 			}
 		}
 
-		mat4 cammat = translate(mat4(1.0f), vec3(campos, 0.0f));
-		mainShader.setMat4("cammat", cammat);
+		mainShader.setMat4("cammat", theCamera.gen_mat());
 
 		glClear(GL_COLOR_BUFFER_BIT);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
