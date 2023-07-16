@@ -5,6 +5,8 @@ project(lestrutter)
 set(TARGET_ARCHITECTURE x64)
 set(CMAKE_CXX_STANDARD 17)
 
+add_definitions(-DSOURCE_PATH="${CMAKE_SOURCE_DIR}")
+
 find_library(SDL2_LIBRARY
   NAMES SDL2
   HINTS
@@ -27,6 +29,8 @@ find_path(SDL2_INCLUDE_DIR SDL.h
 add_executable(lestrutter
     src/main.cpp
     src/glad.c
+
+    src/shader.h
 )
 
 target_include_directories(lestrutter PUBLIC ${SDL2_INCLUDE_DIR} include/)
