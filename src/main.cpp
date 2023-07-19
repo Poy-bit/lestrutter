@@ -8,6 +8,13 @@
 #include "shader.h"
 #include "camera.h"
 
+#define TINYGLTF_IMPLEMENTATION
+#define STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#define TINYGLTF_NOEXCEPTION
+#define JSON_NOEXCEPTION
+#include "tiny_gltf.h"
+
 int main(int argc, char* argv[]) {
 	SDL_Init(SDL_INIT_VIDEO); // TODO: Add to tests
 
@@ -28,22 +35,73 @@ int main(int argc, char* argv[]) {
 
 	gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress); // TODO: Add to tests
 
+	std::string filename = SOURCE_PATH + std::string("/res/parts.glb");
+	tinygltf::Model model;
+	tinygltf::TinyGLTF loader;
+	std::string err;
+	std::string warn;
+
+	bool res = loader.LoadBinaryFromFile(&model, &err, &warn, filename);
+	if (!warn.empty()) {
+		std::cout << "WARN: " << warn << std::endl;
+	}
+
+	if (!err.empty()) {
+		std::cout << "ERR: " << err << std::endl;
+	}
+
+	if (!res)
+		std::cout << "Failed to load glTF: " << filename << std::endl;
+	else
+		std::cout << "Loaded glTF: " << filename << std::endl;
+
+	tinygltf::Scene scene = model.scenes[model.defaultScene];
+	tinygltf::Node node = model.nodes[scene.nodes[0]];
+	tinygltf::Mesh mesh = model.meshes[node.mesh];
+
+	tinygltf::Accessor pos_accessor = model.accessors[mesh.primitives[0].attributes["POSITION"]];
+	tinygltf::BufferView pos_bufferview = model.bufferViews[pos_accessor.bufferView];
+	tinygltf::Accessor index_accessor = model.accessors[mesh.primitives[0].indices];
+	tinygltf::BufferView index_bufferview = model.bufferViews[index_accessor.bufferView];
+
+	GLuint VAO;
+	GLuint VBO;
+	GLuint IBO;
+	glGenVertexArrays(1, &VAO);
+	glGenBuffers(1, &VBO);
+	glGenBuffers(1, &IBO);
+
+	glBindVertexArray(VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(pos_bufferview.target, pos_bufferview.byteLength, (void*)&model.buffers[pos_bufferview.buffer].data[pos_bufferview.byteOffset], GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
+	void* data = (void*)&model.buffers[index_bufferview.buffer].data[index_bufferview.byteOffset];
+	for (int i = 0; i < 50; i++) {
+		std::cout << *((short*)data + i) << ", ";
+	}
+	std::cout << "Count: " << index_accessor.count << std::endl;
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_bufferview.byteLength, data, GL_STATIC_DRAW);
+
+	// Sanity Check
+	assert(pos_accessor.componentType == GL_FLOAT);
+	assert(pos_accessor.count == pos_bufferview.byteLength / sizeof(float) / pos_accessor.type);
+
+	glVertexAttribPointer(0, pos_accessor.type, GL_FLOAT, GL_FALSE, pos_accessor.type * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+
+	//tinygltf::Material mat1 = model.materials[mesh.primitives[0].material];
+	
+
 	float vertices[] = {
 	-0.5f, -0.5f, 0.0f,
 	 0.5f, -0.5f, 0.0f,
 	 0.0f,  0.5f, 0.0f
 	};
 
-	GLuint VAO;
-	GLuint VBO;
-	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO);
-	glBindVertexArray(VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), (void*)&vertices, GL_STATIC_DRAW);
+	/*glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), (void*)&vertices, GL_STATIC_DRAW);
 	
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(0);*/
 
 	shader mainShader = shader(SOURCE_PATH+std::string("/res/shaders/vert.txt"), SOURCE_PATH+std::string("/res/shaders/frag.txt"));
 	mainShader.bind();
@@ -63,7 +121,7 @@ int main(int argc, char* argv[]) {
 			} case (SDL_MOUSEMOTION): {
 				theCamera.mousemove_ev(e.motion);  break;
 			} case (SDL_MOUSEWHEEL): {
-				theCamera.mousewheel_ev(e.wheel); break;
+				theCamera.mousewheel_ev(e.wheel); break; 
 			}
 			}
 		}
@@ -71,7 +129,7 @@ int main(int argc, char* argv[]) {
 		mainShader.setMat4("cammat", theCamera.gen_mat());
 
 		glClear(GL_COLOR_BUFFER_BIT);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		glDrawElements(GL_TRIANGLES, index_accessor.count, GL_UNSIGNED_SHORT, 0);
 
 		SDL_GL_SwapWindow(window);
 	}
