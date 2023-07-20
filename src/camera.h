@@ -13,6 +13,7 @@ public:
 	float camera_zoom = 1.0;
 
 	glm::mat4 gen_mat();
+	glm::mat4 projection();
 
 	void mousedown_ev(SDL_MouseButtonEvent ev);
 	void mouseup_ev(SDL_MouseButtonEvent ev);
