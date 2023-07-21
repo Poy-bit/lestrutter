@@ -1,11 +1,12 @@
 #version 330 core
 layout (location = 0) in vec3 aPos;
-  
+layout (location = 1) in int material;
+
 out vec4 vertexColor;
 uniform mat4 cammat;
 uniform mat4 projection;
 
 void main() {
     gl_Position = projection * cammat * vec4(aPos, 1.0);
-    vertexColor = vec4(0.5, 0.25, 0.0, 1.0);
+    vertexColor = vec4(material, material, material, 1.0);
 }

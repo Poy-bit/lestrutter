@@ -33,7 +33,8 @@ int main(int argc, char* argv[]) {
 	gladLoadGLLoader(SDL_GL_GetProcAddress);
 	SDL_GL_SetSwapInterval(1); // Important Apparently
 
-	gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress); // TODO: Add to tests	
+	gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress); // TODO: Add to tests
+	glEnable(GL_DEPTH_TEST);
 
 	parts Parts = parts();
 
@@ -41,6 +42,8 @@ int main(int argc, char* argv[]) {
 	mainShader.bind();
 
 	camera theCamera;
+
+	glClearColor(105 / 255.0, 81 / 255.0, 88 / 255.0, 1.0);
 
 	SDL_Event e;
 	bool quit = false;
@@ -51,9 +54,9 @@ int main(int argc, char* argv[]) {
 			case (SDL_MOUSEBUTTONDOWN): {
 				theCamera.mousedown_ev(e.button); break;
 			} case (SDL_MOUSEBUTTONUP): {
-				theCamera.mouseup_ev(e.button);  break;
+				theCamera.mouseup_ev(e.button); break;
 			} case (SDL_MOUSEMOTION): {
-				theCamera.mousemove_ev(e.motion);  break;
+				theCamera.mousemove_ev(e.motion); break;
 			} case (SDL_MOUSEWHEEL): {
 				theCamera.mousewheel_ev(e.wheel); break; 
 			}
@@ -63,7 +66,7 @@ int main(int argc, char* argv[]) {
 		mainShader.setMat4("cammat", theCamera.gen_mat());
 		mainShader.setMat4("projection", theCamera.projection());
 
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		Parts.draw();
 
 		SDL_GL_SwapWindow(window);
