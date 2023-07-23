@@ -43,7 +43,10 @@ int main(int argc, char* argv[]) {
 
 	camera theCamera;
 
-	glClearColor(105 / 255.0, 81 / 255.0, 88 / 255.0, 1.0);
+	glClearColor(105/255.0, 81/255.0, 88/255.0, 1.0);
+
+	mainShader.setVec3("material_color[0]", 105/255.0, 81/255.0, 88/255.0);
+	mainShader.setVec3("material_color[1]", 40/255.0, 44/255.0, 52/255.0);
 
 	SDL_Event e;
 	bool quit = false;

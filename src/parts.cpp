@@ -48,7 +48,7 @@ parts::parts() {
 	indices_count = idx_accessor.count + oidx_accessor.count;
 
 	GLuint material_buffer;
-	std::vector<int> material_data(pos_accessor.count + opos_accessor.count, 0);
+	std::vector<unsigned char> material_data(pos_accessor.count + opos_accessor.count, 0);
 	std::fill_n(material_data.begin(), pos_accessor.count, 1);
 
 	glGenVertexArrays(1, &VAO);
@@ -80,13 +80,14 @@ parts::parts() {
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, idx_bufferview.byteLength + oidx_bufferview.byteLength, &index_data[0], GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ARRAY_BUFFER, material_buffer);
-	glBufferData(GL_ARRAY_BUFFER, material_data.size() * sizeof(int), (void*)&material_data[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, material_data.size(), (void*)&material_data[0], GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glVertexAttribPointer(0, pos_accessor.type, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	// Remember to change stride when you add attribs to this buffer
+	glVertexAttribPointer(0, pos_accessor.type, GL_FLOAT, GL_FALSE, 0, (void*)0);
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, material_buffer);
-	glVertexAttribPointer(1, 1, GL_INT, GL_TRUE, sizeof(int), (void*)0);
+	glVertexAttribIPointer(1, 1, GL_BYTE, 0, (void*)0);
 	glEnableVertexAttribArray(1);
 }
 
