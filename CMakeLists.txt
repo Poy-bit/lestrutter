@@ -29,12 +29,12 @@ find_path(SDL2_INCLUDE_DIR SDL.h
 add_executable(lestrutter
     src/main.cpp
     src/camera.cpp
-    src/parts.cpp
+    src/ol_mesh.cpp
     src/glad.c
 
     src/shader.h
     src/camera.h
-    src/parts.h
+    src/ol_mesh.h
 )
 
 target_include_directories(lestrutter PUBLIC ${SDL2_INCLUDE_DIR} include/)
