@@ -16,6 +16,8 @@ class ol_mesh {
 	void lbuf_indices(tinygltf::Model model, int mat_prim, int out_prim, int vert_count);
 
 public:
+	int mvc;
+
 	ol_mesh(tinygltf::Model model, int node_index);
 	void draw();
 };

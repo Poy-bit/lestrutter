@@ -17,15 +17,11 @@ ol_mesh::ol_mesh(tinygltf::Model model, int node_index) {
 	assert(pos_accessor.componentType == GL_FLOAT);
 	assert(pos_accessor.count == pos_bufferview.byteLength / sizeof(float) / pos_accessor.type);
 
+	mvc = pos_accessor.count;
 	indices_count = model.accessors[material_primitive.indices].count + model.accessors[outline_primitive.indices].count;
-
-	GLuint material_buffer;
-	std::vector<unsigned char> material_data(pos_accessor.count + opos_accessor.count, 0);
-	std::fill_n(material_data.begin(), pos_accessor.count, 1);
 
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
-	glGenBuffers(1, &material_buffer);
 	glGenBuffers(1, &IBO);
 
 	glBindVertexArray(VAO);
@@ -41,16 +37,10 @@ ol_mesh::ol_mesh(tinygltf::Model model, int node_index) {
 	glBufferData(pos_bufferview.target, pos_bufferview.byteLength + opos_bufferview.byteLength, &data[0], GL_STATIC_DRAW);
 	lbuf_indices(model, material_primitive.indices, outline_primitive.indices, pos_accessor.count);
 
-	glBindBuffer(GL_ARRAY_BUFFER, material_buffer);
-	glBufferData(GL_ARRAY_BUFFER, material_data.size(), (void*)&material_data[0], GL_STATIC_DRAW);
-
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	// Remember to change stride when you add attribs to this buffer
 	glVertexAttribPointer(0, pos_accessor.type, GL_FLOAT, GL_FALSE, 0, (void*)0);
 	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, material_buffer);
-	glVertexAttribIPointer(1, 1, GL_BYTE, 0, (void*)0);
-	glEnableVertexAttribArray(1);
 }
 
 void ol_mesh::draw() {
