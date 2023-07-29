@@ -13,7 +13,7 @@
 #include <string>
 #include "shader.h"
 #include "camera.h"
-#include "parts.h"
+#include "ol_mesh.h"
 
 int main(int argc, char* argv[]) {
 	SDL_Init(SDL_INIT_VIDEO); // TODO: Add to tests
@@ -36,7 +36,28 @@ int main(int argc, char* argv[]) {
 	gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress); // TODO: Add to tests
 	glEnable(GL_DEPTH_TEST);
 
-	parts Parts = parts();
+	// Load parts model from file
+	std::string filename = SOURCE_PATH + std::string("/res/parts.glb");
+	tinygltf::Model model;
+	tinygltf::TinyGLTF loader;
+	std::string err;
+	std::string warn;
+
+	bool res = loader.LoadBinaryFromFile(&model, &err, &warn, filename);
+	if (!warn.empty()) {
+		std::cout << "Loader Warning: " << warn << std::endl;
+	}
+
+	if (!err.empty()) {
+		std::cout << "Loader Error: " << err << std::endl;
+	}
+
+	if (!res)
+		std::cout << "Failed to load glTF: " << filename << std::endl;
+
+	tinygltf::Scene scene = model.scenes[model.defaultScene];
+	tinygltf::Node armature = model.nodes[scene.nodes[0]];
+	ol_mesh parts = ol_mesh(model, armature.children[0]);
 
 	shader mainShader = shader(SOURCE_PATH+std::string("/res/shaders/vert.txt"), SOURCE_PATH+std::string("/res/shaders/frag.txt"));
 	mainShader.bind();
@@ -70,7 +91,7 @@ int main(int argc, char* argv[]) {
 		mainShader.setMat4("projection", theCamera.projection());
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		Parts.draw();
+		parts.draw();
 
 		SDL_GL_SwapWindow(window);
 	}

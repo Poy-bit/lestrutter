@@ -1,30 +1,8 @@
-#include "parts.h"
+#include "ol_mesh.h"
 
-#include <valarray>
-
-parts::parts() {
-	// Load parts model from file
-	std::string filename = SOURCE_PATH + std::string("/res/parts.glb");
-	tinygltf::Model model;
-	tinygltf::TinyGLTF loader;
-	std::string err;
-	std::string warn;
-
-	bool res = loader.LoadBinaryFromFile(&model, &err, &warn, filename);
-	if (!warn.empty()) {
-		std::cout << "Loader Warning: " << warn << std::endl;
-	}
-
-	if (!err.empty()) {
-		std::cout << "Loader Error: " << err << std::endl;
-	}
-
-	if (!res)
-		std::cout << "Failed to load glTF: " << filename << std::endl;
-
-	tinygltf::Scene scene = model.scenes[model.defaultScene];
-	tinygltf::Node armature = model.nodes[scene.nodes[0]];
-	tinygltf::Node node = model.nodes[armature.children[0]];
+ol_mesh::ol_mesh(tinygltf::Model model, int node_index) {
+	tinygltf::Node node = model.nodes[node_index];
+	//tinygltf::Node node = model.nodes[scene.nodes[1]];
 	tinygltf::Mesh mesh = model.meshes[node.mesh];
 
 	tinygltf::Primitive material_primitive = mesh.primitives[0];
@@ -32,20 +10,14 @@ parts::parts() {
 
 	tinygltf::Accessor pos_accessor = model.accessors[material_primitive.attributes["POSITION"]];
 	tinygltf::Accessor opos_accessor = model.accessors[outline_primitive.attributes["POSITION"]];
-	tinygltf::Accessor idx_accessor = model.accessors[material_primitive.indices];
-	tinygltf::Accessor oidx_accessor = model.accessors[outline_primitive.indices];
 	tinygltf::BufferView pos_bufferview = model.bufferViews[pos_accessor.bufferView];
 	tinygltf::BufferView opos_bufferview = model.bufferViews[opos_accessor.bufferView];
-	tinygltf::BufferView idx_bufferview = model.bufferViews[idx_accessor.bufferView];
-	tinygltf::BufferView oidx_bufferview = model.bufferViews[oidx_accessor.bufferView];
 
 	// Sanity Check
 	assert(pos_accessor.componentType == GL_FLOAT);
 	assert(pos_accessor.count == pos_bufferview.byteLength / sizeof(float) / pos_accessor.type);
-	assert(idx_accessor.componentType == GL_UNSIGNED_SHORT);
-	assert(idx_accessor.count == idx_bufferview.byteLength / sizeof(short));
 
-	indices_count = idx_accessor.count + oidx_accessor.count;
+	indices_count = model.accessors[material_primitive.indices].count + model.accessors[outline_primitive.indices].count;
 
 	GLuint material_buffer;
 	std::vector<unsigned char> material_data(pos_accessor.count + opos_accessor.count, 0);
@@ -67,17 +39,7 @@ parts::parts() {
 		&model.buffers[opos_bufferview.buffer].data[0] + opos_bufferview.byteOffset + opos_bufferview.byteLength);
 
 	glBufferData(pos_bufferview.target, pos_bufferview.byteLength + opos_bufferview.byteLength, &data[0], GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
-	std::vector<short> index_data;
-	short* buffer_vector = (short*)model.buffers[idx_bufferview.buffer].data.data() + idx_bufferview.byteOffset / sizeof(short);
-	index_data.assign(buffer_vector, buffer_vector + idx_bufferview.byteLength / sizeof(short));	
-	buffer_vector = (short*)model.buffers[oidx_bufferview.buffer].data.data() + oidx_bufferview.byteOffset / sizeof(short);
-	index_data.insert(index_data.begin() + index_data.size(),
-		buffer_vector, buffer_vector + oidx_bufferview.byteLength / sizeof(short));
-
-	for (int i = idx_accessor.count; i < idx_accessor.count + oidx_accessor.count; i++)
-		index_data[i] = index_data[i] + pos_accessor.count;
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, idx_bufferview.byteLength + oidx_bufferview.byteLength, &index_data[0], GL_STATIC_DRAW);
+	lbuf_indices(model, material_primitive.indices, outline_primitive.indices, pos_accessor.count);
 
 	glBindBuffer(GL_ARRAY_BUFFER, material_buffer);
 	glBufferData(GL_ARRAY_BUFFER, material_data.size(), (void*)&material_data[0], GL_STATIC_DRAW);
@@ -91,6 +53,29 @@ parts::parts() {
 	glEnableVertexAttribArray(1);
 }
 
-void parts::draw() {
+void ol_mesh::draw() {
 	glDrawElements(GL_TRIANGLES, indices_count, GL_UNSIGNED_SHORT, 0);
+}
+
+void ol_mesh::lbuf_indices(tinygltf::Model model, int mat_prim, int out_prim, int vert_count) {
+	tinygltf::Accessor idx_accessor = model.accessors[mat_prim];
+	tinygltf::Accessor oidx_accessor = model.accessors[out_prim];
+	tinygltf::BufferView idx_bufferview = model.bufferViews[idx_accessor.bufferView];
+	tinygltf::BufferView oidx_bufferview = model.bufferViews[oidx_accessor.bufferView];
+
+	// sanity check
+	assert(idx_accessor.componentType == GL_UNSIGNED_SHORT);
+	assert(idx_accessor.count == idx_bufferview.byteLength / sizeof(short));
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
+	std::vector<short> index_data;
+	short* buffer_vector = (short*)model.buffers[idx_bufferview.buffer].data.data() + idx_bufferview.byteOffset / sizeof(short);
+	index_data.assign(buffer_vector, buffer_vector + idx_bufferview.byteLength / sizeof(short));
+	buffer_vector = (short*)model.buffers[oidx_bufferview.buffer].data.data() + oidx_bufferview.byteOffset / sizeof(short);
+	index_data.insert(index_data.begin() + index_data.size(),
+		buffer_vector, buffer_vector + oidx_bufferview.byteLength / sizeof(short));
+
+	for (int i = idx_accessor.count; i < idx_accessor.count + oidx_accessor.count; i++)
+		index_data[i] = index_data[i] + vert_count;
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, idx_bufferview.byteLength + oidx_bufferview.byteLength, &index_data[0], GL_STATIC_DRAW);
 }
