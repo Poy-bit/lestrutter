@@ -2,7 +2,6 @@
 
 ol_mesh::ol_mesh(tinygltf::Model model, int node_index) {
 	tinygltf::Node node = model.nodes[node_index];
-	//tinygltf::Node node = model.nodes[scene.nodes[1]];
 	tinygltf::Mesh mesh = model.meshes[node.mesh];
 
 	tinygltf::Primitive material_primitive = mesh.primitives[0];

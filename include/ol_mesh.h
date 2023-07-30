@@ -3,7 +3,7 @@
 #include <iostream>
 
 #include "glad/glad.h"
-#include "tiny_gltf.h"
+#include "tiny_gltf/tiny_gltf.h"
 
 // An outline mesh is a mesh with two materials, one of which being an outline material colored the same as the background
 class ol_mesh {

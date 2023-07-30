@@ -10,19 +10,19 @@ add_definitions(-DSOURCE_PATH="${CMAKE_SOURCE_DIR}")
 find_library(SDL2_LIBRARY
   NAMES SDL2
   HINTS
-    dependencies
+    dependencies/libraries/SDL2
   PATH_SUFFIXES lib
 )
 find_library(SDL2_LIBRARY_MAIN
   NAMES SDL2MAIN
   HINTS
-    dependencies
+    dependencies/libraries/SDL2
   PATH_SUFFIXES lib
 )
 
 find_path(SDL2_INCLUDE_DIR SDL.h
   HINTS
-    include
+    dependencies/libraries
   PATH_SUFFIXES SDL2
 )
 
@@ -30,12 +30,14 @@ add_executable(lestrutter
     src/main.cpp
     src/camera.cpp
     src/ol_mesh.cpp
+    src/rigidbody.cpp
     src/glad.c
 
-    src/shader.h
-    src/camera.h
-    src/ol_mesh.h
+    include/shader.h
+    include/camera.h
+    include/ol_mesh.h
+    include/rigidbody.h
 )
 
-target_include_directories(lestrutter PUBLIC ${SDL2_INCLUDE_DIR} include/)
+target_include_directories(lestrutter PUBLIC ${SDL2_INCLUDE_DIR} dependencies/libraries include/ dependencies/libraries/stb)
 target_link_libraries(lestrutter ${SDL2_LIBRARY} ${SDL2_LIBRARY_MAIN})

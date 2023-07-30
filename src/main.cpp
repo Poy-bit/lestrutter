@@ -14,6 +14,7 @@
 #include "shader.h"
 #include "camera.h"
 #include "ol_mesh.h"
+#include "rigidbody.h"
 
 int main(int argc, char* argv[]) {
 	SDL_Init(SDL_INIT_VIDEO); // TODO: Add to tests
@@ -57,7 +58,17 @@ int main(int argc, char* argv[]) {
 
 	tinygltf::Scene scene = model.scenes[model.defaultScene];
 	tinygltf::Node armature = model.nodes[scene.nodes[0]];
-	ol_mesh parts = ol_mesh(model, armature.children[0]);
+
+	int ball_index = -1;
+	for (int i = 0; i < model.nodes.size(); i++) {
+		if (model.nodes[i].name == "ball") {
+			ball_index = i;
+			break;
+		}
+	}
+
+	ol_mesh ball = ol_mesh(model, ball_index);
+	rigidbody ball_body = rigidbody();
 
 	shader mainShader = shader(SOURCE_PATH+std::string("/res/shaders/vert.txt"), SOURCE_PATH+std::string("/res/shaders/frag.txt"));
 	mainShader.bind();
@@ -68,7 +79,6 @@ int main(int argc, char* argv[]) {
 
 	mainShader.setVec3("material_color[0]", 40 / 255.0, 44 / 255.0, 52 / 255.0);
 	mainShader.setVec3("material_color[1]", 105/255.0, 81/255.0, 88/255.0);
-	mainShader.setInt("mvc", parts.mvc);
 
 	SDL_Event e;
 	bool quit = false;
@@ -88,11 +98,13 @@ int main(int argc, char* argv[]) {
 			}
 		}
 
-		mainShader.setMat4("cammat", theCamera.gen_mat());
 		mainShader.setMat4("projection", theCamera.projection());
+		mainShader.setMat4("view_matrix", theCamera.gen_mat());
+		mainShader.setMat4("model", ball_body.get_model_matrix());
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		parts.draw();
+		mainShader.setInt("mvc", ball.mvc);
+		ball.draw();
 
 		SDL_GL_SwapWindow(window);
 	}

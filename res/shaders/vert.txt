@@ -2,13 +2,14 @@
 layout (location = 0) in vec3 aPos;
 
 out vec4 vertexColor;
-uniform mat4 cammat;
 uniform mat4 projection;
+uniform mat4 view_matrix;
+uniform mat4 model;
 
 uniform vec3 material_color[2];
 uniform int mvc;
 
 void main() {
-    gl_Position = projection * cammat * vec4(aPos, 1.0);
+    gl_Position = projection * view_matrix * model * vec4(aPos, 1.0);
     vertexColor = vec4(material_color[int(gl_VertexID<mvc)], 1.0);
 }
