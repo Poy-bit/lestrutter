@@ -80,6 +80,10 @@ int main(int argc, char* argv[]) {
 	mainShader.setVec3("material_color[0]", 40 / 255.0, 44 / 255.0, 52 / 255.0);
 	mainShader.setVec3("material_color[1]", 105/255.0, 81/255.0, 88/255.0);
 
+	Uint64 time_now = SDL_GetPerformanceCounter();
+	Uint64 time_last = 0;
+	double dt = 0;
+
 	SDL_Event e;
 	bool quit = false;
 	while (!quit) {
@@ -97,6 +101,13 @@ int main(int argc, char* argv[]) {
 			}
 			}
 		}
+
+		time_last = time_now;
+		time_now = SDL_GetPerformanceCounter();
+
+		dt = (double)((time_now - time_last) / (double)SDL_GetPerformanceFrequency());
+		ball_body.update((float)dt);
+		ball_body.apply_acceleration(glm::vec2(0, -9.8));
 
 		mainShader.setMat4("projection", theCamera.projection());
 		mainShader.setMat4("view_matrix", theCamera.gen_mat());
