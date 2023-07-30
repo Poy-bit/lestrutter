@@ -1,7 +1,8 @@
 #include "rigidbody.h"
+#include <iostream>
 
 rigidbody::rigidbody() {
-	position = glm::vec2(0, 50);
+	position = glm::vec2(10, 10);
 	old_position = position;
 }
 

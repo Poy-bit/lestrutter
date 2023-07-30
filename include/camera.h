@@ -10,7 +10,7 @@
 class camera {
 public:
 	glm::vec2 camera_pos = {0, 0};
-	float camera_zoom = 1.0;
+	float camera_zoom = 1.0/50;
 
 	glm::mat4 gen_mat();
 	glm::mat4 projection();

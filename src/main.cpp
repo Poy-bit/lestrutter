@@ -106,6 +106,7 @@ int main(int argc, char* argv[]) {
 		time_now = SDL_GetPerformanceCounter();
 
 		dt = (double)((time_now - time_last) / (double)SDL_GetPerformanceFrequency());
+		ball_body.apply_constraint();
 		ball_body.update((float)dt);
 		ball_body.apply_acceleration(glm::vec2(0, -9.8));
 
