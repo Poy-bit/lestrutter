@@ -15,6 +15,7 @@
 #include "camera.h"
 #include "ol_mesh.h"
 #include "rigidbody.h"
+#include "physics.h"
 
 int main(int argc, char* argv[]) {
 	SDL_Init(SDL_INIT_VIDEO); // TODO: Add to tests
@@ -68,7 +69,11 @@ int main(int argc, char* argv[]) {
 	}
 
 	ol_mesh ball = ol_mesh(model, ball_index);
-	rigidbody ball_body = rigidbody();
+	physics world = physics();
+	rigidbody rigidbody1 = rigidbody(-5, 2, vec2(4, 2));
+	rigidbody rigidbody2 = rigidbody(5, 2, vec2(-4, 2));
+	world.add_body(&rigidbody1);
+	world.add_body(&rigidbody2);
 
 	shader mainShader = shader(SOURCE_PATH+std::string("/res/shaders/vert.txt"), SOURCE_PATH+std::string("/res/shaders/frag.txt"));
 	mainShader.bind();
@@ -106,16 +111,16 @@ int main(int argc, char* argv[]) {
 		time_now = SDL_GetPerformanceCounter();
 
 		dt = (double)((time_now - time_last) / (double)SDL_GetPerformanceFrequency());
-		ball_body.apply_constraint();
-		ball_body.update((float)dt);
-		ball_body.apply_acceleration(glm::vec2(0, -9.8));
+		world.step(dt);
 
 		mainShader.setMat4("projection", theCamera.projection());
 		mainShader.setMat4("view_matrix", theCamera.gen_mat());
-		mainShader.setMat4("model", ball_body.get_model_matrix());
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		mainShader.setInt("mvc", ball.mvc);
+		mainShader.setInt("mvc", ball.mvc); // forgot what this meant. main vector count?
+		mainShader.setMat4("model", rigidbody1.get_model_matrix());
+		ball.draw();
+		mainShader.setMat4("model", rigidbody2.get_model_matrix());
 		ball.draw();
 
 		SDL_GL_SwapWindow(window);

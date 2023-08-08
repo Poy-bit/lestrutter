@@ -31,12 +31,16 @@ add_executable(lestrutter
     src/camera.cpp
     src/ol_mesh.cpp
     src/rigidbody.cpp
+    src/collider.cpp
+    src/physics.cpp
     src/glad.c
 
     include/shader.h
     include/camera.h
     include/ol_mesh.h
     include/rigidbody.h
+    include/collider.h
+    include/physics.h
 )
 
 target_include_directories(lestrutter PUBLIC ${SDL2_INCLUDE_DIR} dependencies/libraries include/ dependencies/libraries/stb)

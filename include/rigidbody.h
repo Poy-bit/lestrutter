@@ -2,33 +2,39 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
+#include "collider.h"
+
+struct vec2 {
+    double x, y;
+    vec2() : x(0), y(0) {}
+    vec2(double x, double y): x(x), y(y) {}
+
+    vec2 operator *(double op2) {
+        return vec2(x * op2, y * op2);
+    }
+
+    vec2 operator +(vec2 op2) {
+        return vec2(x + op2.x, y + op2.y);
+    }
+
+    float distance(vec2 p) {
+        return sqrt(pow(x - p.x, 2) + pow(y - p.y, 2));
+    }
+};
 
 class rigidbody {
-    glm::vec2 old_position;
-    glm::vec2 position;
-    glm::vec2 acceleration = {};
+    vec2 pos;
+    vec2 vel;
+    vec2 acc = {};
 
-    float mass;
+    collider* body_collider = nullptr;
 
 public:
     rigidbody();
+    rigidbody(float x, float y, vec2 vel);
     
+    void add_collider(collider* pCollider);
+
     glm::mat4 get_model_matrix();
-    void update(float dt);
-
-    void apply_acceleration(glm::vec2 applied_acceleration) {
-        acceleration += applied_acceleration;
-    }
-
-    void apply_constraint() {
-        glm::vec2 anchor = { 0, 0 };
-        float radius = 20.0;
-        //glm::vec2 to_obj = position - constraint_position;
-        float dist = glm::length(position - anchor);
-        
-        if (dist > radius) {
-            position = (glm::normalize(position - anchor) * 20.0f) + anchor;
-            std::cout << "bruh\n";
-        }
-    }
+    void step(double dt);
 };

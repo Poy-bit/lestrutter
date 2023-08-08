@@ -1,18 +1,24 @@
 #include "rigidbody.h"
-#include <iostream>
 
-rigidbody::rigidbody() {
-	position = glm::vec2(10, 10);
-	old_position = position;
+rigidbody::rigidbody(): pos(vec2(0, 0)), vel(vec2(0, 0))
+{}
+
+rigidbody::rigidbody(float x, float y, vec2 vel) : pos(vec2(x, y)), vel(vel)
+{}
+
+void rigidbody::add_collider(collider* pCollider) {
+	body_collider = pCollider;
 }
 
 glm::mat4 rigidbody::get_model_matrix() {
-	return glm::translate(glm::mat4(1.0f), glm::vec3(position, 0.0f));
+	return glm::translate(glm::mat4(1.0f), glm::vec3(pos.x, pos.y, 0.0f));
 }
 
-void rigidbody::update(float dt) {
-	glm::vec2 velocity = position - old_position;
-	old_position = position;
-	position = position + velocity + acceleration * dt * dt;
-	acceleration = {};
+void rigidbody::step(double dt) {
+	acc = { 0, 0 };
+	vel = vel + acc * dt;
+
+	//if (pos.y < 0) vel.y = -pos.y / dt;
+
+	pos = pos + vel * dt;
 }
