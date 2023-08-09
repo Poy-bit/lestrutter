@@ -41,6 +41,7 @@ add_executable(lestrutter
     include/rigidbody.h
     include/collider.h
     include/physics.h
+    include/mathtypes.h
 )
 
 target_include_directories(lestrutter PUBLIC ${SDL2_INCLUDE_DIR} dependencies/libraries include/ dependencies/libraries/stb)

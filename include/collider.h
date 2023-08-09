@@ -1,27 +1,26 @@
 #pragma once
 
 #include "rigidbody.h"
+#include "mathtypes.h"
 
 class Collision {
 public:
-	Collision() 
+	Collision() {}
 };
 
 class Collider {
+	Transform transform;
+
 public:
-	Collider();
-	virtual Collision test_collision(CircleCollider* other_collider) {}
+	Collider() {}
+	Collision test_collision(Collider* other_collider) { return Collision(); }
 };
 
-class CircleCollider: Collider {
+class CircleCollider : public Collider {
 	float radius;
-	vec2 position;
+	Transform transform;
 
 public:
 	CircleCollider(float radius = 1) : radius(radius) {}
-	Collision test_collision(CircleCollider* other_collider) {
-		if (position.distance(other_collider->position) < radius + other_collider->radius) {
-			return
-		}
-	}
+	Collision test_collision(CircleCollider* other_collider);
 };

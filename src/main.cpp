@@ -70,8 +70,8 @@ int main(int argc, char* argv[]) {
 
 	ol_mesh ball = ol_mesh(model, ball_index);
 	physics world = physics();
-	rigidbody rigidbody1 = rigidbody(-5, 2, vec2(4, 2));
-	rigidbody rigidbody2 = rigidbody(5, 2, vec2(-4, 2));
+	Rigidbody rigidbody1 = Rigidbody(-5, 2, vec2(4, 2));
+	Rigidbody rigidbody2 = Rigidbody(5, 2, vec2(-4, 2));
 	world.add_body(&rigidbody1);
 	world.add_body(&rigidbody2);
 
@@ -118,9 +118,9 @@ int main(int argc, char* argv[]) {
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		mainShader.setInt("mvc", ball.mvc); // forgot what this meant. main vector count?
-		mainShader.setMat4("model", rigidbody1.get_model_matrix());
+		mainShader.setMat4("model", rigidbody1.getModelMatrix());
 		ball.draw();
-		mainShader.setMat4("model", rigidbody2.get_model_matrix());
+		mainShader.setMat4("model", rigidbody2.getModelMatrix());
 		ball.draw();
 
 		SDL_GL_SwapWindow(window);

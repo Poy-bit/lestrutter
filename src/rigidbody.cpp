@@ -1,20 +1,20 @@
 #include "rigidbody.h"
 
-rigidbody::rigidbody(): pos(vec2(0, 0)), vel(vec2(0, 0))
+Rigidbody::Rigidbody(): pos(vec2(0, 0)), vel(vec2(0, 0))
 {}
 
-rigidbody::rigidbody(float x, float y, vec2 vel) : pos(vec2(x, y)), vel(vel)
+Rigidbody::Rigidbody(float x, float y, vec2 vel) : pos(vec2(x, y)), vel(vel)
 {}
 
-void rigidbody::add_collider(collider* pCollider) {
+void Rigidbody::setCollider(Collider* pCollider) {
 	body_collider = pCollider;
 }
 
-glm::mat4 rigidbody::get_model_matrix() {
+glm::mat4 Rigidbody::getModelMatrix() {
 	return glm::translate(glm::mat4(1.0f), glm::vec3(pos.x, pos.y, 0.0f));
 }
 
-void rigidbody::step(double dt) {
+void Rigidbody::step(double dt) {
 	acc = { 0, 0 };
 	vel = vel + acc * dt;
 

@@ -2,7 +2,7 @@
 
 physics::physics() {}
 
-void physics::add_body(rigidbody* body) {
+void physics::add_body(Rigidbody* body) {
 	bodies.push_back(body);
 }
 
