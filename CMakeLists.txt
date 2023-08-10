@@ -30,9 +30,7 @@ add_executable(lestrutter
     src/main.cpp
     src/camera.cpp
     src/ol_mesh.cpp
-    src/rigidbody.cpp
     src/collider.cpp
-    src/physics.cpp
     src/glad.c
 
     include/shader.h

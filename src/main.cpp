@@ -27,6 +27,9 @@ int main(int argc, char* argv[]) {
 	SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
+	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
+
 	SDL_Window* window = SDL_CreateWindow("Lestrutter", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
 
 	SDL_GLContext gl_context = SDL_GL_CreateContext(window); // TODO: Add to tests
@@ -37,6 +40,7 @@ int main(int argc, char* argv[]) {
 
 	gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress); // TODO: Add to tests
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_MULTISAMPLE);
 
 	// Load parts model from file
 	std::string filename = SOURCE_PATH + std::string("/res/parts.glb");
@@ -69,9 +73,9 @@ int main(int argc, char* argv[]) {
 	}
 
 	ol_mesh ball = ol_mesh(model, ball_index);
-	physics world = physics();
-	Rigidbody rigidbody1 = Rigidbody(-5, 2, vec2(4, 2));
-	Rigidbody rigidbody2 = Rigidbody(5, 2, vec2(-4, 2));
+	Physics world = Physics();
+	Rigidbody rigidbody1 = Rigidbody(vec2(-5, 2), vec2(4, 2));
+	Rigidbody rigidbody2 = Rigidbody(vec2(5, 2), vec2(-4, 2));
 	world.add_body(&rigidbody1);
 	world.add_body(&rigidbody2);
 
@@ -80,10 +84,10 @@ int main(int argc, char* argv[]) {
 
 	camera theCamera;
 
-	glClearColor(40 / 255.0, 44 / 255.0, 52 / 255.0, 1.0);
+	glClearColor(47 / 255.0, 53 / 255.0, 59 / 255.0, 1.0);
 
-	mainShader.setVec3("material_color[0]", 40 / 255.0, 44 / 255.0, 52 / 255.0);
-	mainShader.setVec3("material_color[1]", 105/255.0, 81/255.0, 88/255.0);
+	mainShader.setVec3("material_color[0]", 47 / 255.0, 53 / 255.0, 59 / 255.0);
+	mainShader.setVec3("material_color[1]", 62/255.0, 146/255.0, 204/255.0);
 
 	Uint64 time_now = SDL_GetPerformanceCounter();
 	Uint64 time_last = 0;

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cmath>
+
 // Used lowercase for easier typing
 class vec2 {
 public:

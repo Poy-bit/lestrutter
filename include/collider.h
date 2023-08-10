@@ -1,26 +1,24 @@
 #pragma once
 
-#include "rigidbody.h"
 #include "mathtypes.h"
 
-class Collision {
-public:
-	Collision() {}
+struct Collision {
+	vec2 pos1;
+	vec2 pos2;
+	vec2 penetration1;
+	vec2 penetration2;
 };
 
-class Collider {
-	Transform transform;
+struct Collider;
+struct CircleCollider;
 
-public:
+struct Collider {
 	Collider() {}
-	Collision test_collision(Collider* other_collider) { return Collision(); }
+	virtual Collision testCollision(CircleCollider* circle, Transform transform) const = 0;
 };
 
-class CircleCollider : public Collider {
+struct CircleCollider : public Collider {
 	float radius;
-	Transform transform;
-
-public:
-	CircleCollider(float radius = 1) : radius(radius) {}
-	Collision test_collision(CircleCollider* other_collider);
+	CircleCollider(float radius=1) : radius(radius) {}
+	Collision testCollision(CircleCollider* circle, Transform transform);
 };
