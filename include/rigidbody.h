@@ -5,7 +5,7 @@
 
 #include "mathtypes.h"
 
-class Collider;
+struct Collider;
 
 struct Rigidbody {
     Collider* body_collider = {};
@@ -23,5 +23,11 @@ struct Rigidbody {
 
     glm::mat4 getModelMatrix() {
         return glm::translate(glm::mat4(1.0f), glm::vec3(pos.x, pos.y, 0.0f));
+    }
+
+    Transform getTransform() {
+        Transform transform = Transform();
+        transform.position = pos;
+        return transform;
     }
 };

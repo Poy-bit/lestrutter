@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <cmath>
 
 // Used lowercase for easier typing
@@ -15,6 +16,18 @@ public:
 
     vec2 operator +(vec2 op2) {
         return vec2(x + op2.x, y + op2.y);
+    }
+
+    vec2 operator +(float op2) {
+        return vec2(x + op2, y + op2);
+    }
+
+    vec2 operator -(vec2 op2) {
+        return vec2(x - op2.x, y - op2.y);
+    }
+
+    vec2 operator -(float op2) {
+        return vec2(x - op2, y - op2);
     }
 
     float distance(vec2 p) {
