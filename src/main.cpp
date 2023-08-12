@@ -76,8 +76,8 @@ int main(int argc, char* argv[]) {
 	Physics world = Physics();
 	Rigidbody rigidbody1 = Rigidbody(vec2(-5, 2), vec2(4, 2));
 	Rigidbody rigidbody2 = Rigidbody(vec2(5, 2), vec2(-4, 2));
-	CircleCollider collider1 = CircleCollider(rigidbody1.getTransform());
-	CircleCollider collider2 = CircleCollider(rigidbody2.getTransform());
+	CircleCollider collider1 = CircleCollider(&rigidbody1.pos);
+	CircleCollider collider2 = CircleCollider(&rigidbody2.pos);
 	rigidbody1.setCollider(&collider1);
 	rigidbody2.setCollider(&collider2);
 	world.add_body(&rigidbody1);

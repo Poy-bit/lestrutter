@@ -14,6 +14,10 @@ public:
         return vec2(x * op2, y * op2);
     }
 
+    vec2 operator /(double op2) {
+        return vec2(x / op2, y / op2);
+    }
+
     vec2 operator +(vec2 op2) {
         return vec2(x + op2.x, y + op2.y);
     }
@@ -30,8 +34,21 @@ public:
         return vec2(x - op2, y - op2);
     }
 
-    float distance(vec2 p) {
-        return sqrt(pow(x - p.x, 2) + pow(y - p.y, 2));
+    vec2 operator -() {
+        return vec2(-x, -y);
+    }
+
+    float distance(vec2 v) {
+        return sqrt(pow(x - v.x, 2) + pow(y - v.y, 2));
+    }
+
+    float length() {
+        return sqrt(pow(x, 2) + pow(y, 2));
+    }
+
+    vec2 normalize() {
+        float len = length();
+        return vec2(x / len, y / len);
     }
 };
 

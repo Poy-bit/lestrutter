@@ -9,8 +9,7 @@ class Physics {
 	std::vector<Rigidbody*> bodies;
 	aabbtree broadphase;
 public:
-	Physics() {
-	}
+	Physics() {}
 
 	void add_body(Rigidbody* body) {
 		broadphase.add(body->body_collider->bounding_box);
@@ -27,13 +26,24 @@ public:
 			body->acc = { 0, 0 };
 			body->vel = body->vel + body->acc * dt;
 			body->pos = body->pos + body->vel * dt;
+			body->body_collider->update();
 		}
 
 		std::vector<std::pair<aabb, aabb>> collider_pairs = broadphase.computeColliderPairs();
 		for (int i = 0; i < collider_pairs.size(); i++) {
 			std::pair<aabb, aabb> collider_pair = collider_pairs[i];
-			//Collider first_collider = *collider_pair.first.collider;
-			//Collider second_collider = *collider_pair.first.collider;
+			Collider* first_collider = collider_pair.first.collider;
+			Collider* second_collider = collider_pair.second.collider;
+
+			Collision collision;
+			switch (second_collider->type) {
+			case(eColliderTypes::CIRCLE):
+				collision = first_collider->testCollision((CircleCollider*)second_collider); break;
+			}
+			if (!collision.a.x) { continue; }
+			vec2 n = collision.b - collision.a;
+			(*first_collider->user).vel = n/2;
+			(*second_collider->user).vel = -n/2;
 		}
 	}
 };

@@ -21,8 +21,8 @@ struct aabb {
 
     bool collides(aabb o_aabb) {
         return
-            (max_point.x > o_aabb.min_point.x || o_aabb.max_point.x > min_point.x) &&
-            (max_point.y > o_aabb.min_point.y || o_aabb.max_point.y > min_point.y);
+            (max_point.x >= o_aabb.min_point.x && min_point.x <= o_aabb.max_point.x) &&
+            (max_point.y >= o_aabb.min_point.y && min_point.y <= o_aabb.max_point.y);
     }
 
     float area() {

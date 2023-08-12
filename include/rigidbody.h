@@ -4,8 +4,7 @@
 #include <iostream>
 
 #include "mathtypes.h"
-
-struct Collider;
+#include "collider.h"
 
 struct Rigidbody {
     Collider* body_collider = {};
@@ -18,16 +17,11 @@ struct Rigidbody {
     Rigidbody(vec2 pos, vec2 vel = {0, 0}) : pos(pos), vel(vel) {}
     
     void setCollider(Collider* pCollider) {
+        pCollider->user = this;
         body_collider = pCollider;
     }
 
     glm::mat4 getModelMatrix() {
         return glm::translate(glm::mat4(1.0f), glm::vec3(pos.x, pos.y, 0.0f));
-    }
-
-    Transform getTransform() {
-        Transform transform = Transform();
-        transform.position = pos;
-        return transform;
     }
 };
