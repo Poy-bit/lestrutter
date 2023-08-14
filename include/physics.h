@@ -35,15 +35,23 @@ public:
 			Collider* first_collider = collider_pair.first.collider;
 			Collider* second_collider = collider_pair.second.collider;
 
-			Collision collision;
+			Contact* contact;
 			switch (second_collider->type) {
 			case(eColliderTypes::CIRCLE):
-				collision = first_collider->testCollision((CircleCollider*)second_collider); break;
+				contact = first_collider->testCollision((CircleCollider*)second_collider); break;
 			}
-			if (!collision.a.x) { continue; }
-			vec2 n = collision.b - collision.a;
-			(*first_collider->user).vel = n/2;
-			(*second_collider->user).vel = -n/2;
+			if (contact == nullptr) { continue; }
+			Rigidbody* body_a = first_collider->user;
+			Rigidbody* body_b = second_collider->user;
+
+			vec2 rel_vel = body_b->vel - body_a->vel;
+
+			float e = 1;
+			float impulse_magnitude = contact->n.dot(rel_vel);
+			vec2 impulse = contact->n * impulse_magnitude;
+		
+			body_a->vel = body_a->vel + impulse;
+			body_b->vel = body_b->vel - impulse;
 		}
 	}
 };

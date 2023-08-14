@@ -42,6 +42,10 @@ public:
         return sqrt(pow(x - v.x, 2) + pow(y - v.y, 2));
     }
 
+    float dot(vec2 v) {
+        return x * v.x + y * v.y;
+    }
+
     float length() {
         return sqrt(pow(x, 2) + pow(y, 2));
     }
