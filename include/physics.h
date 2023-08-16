@@ -45,13 +45,12 @@ public:
 			Rigidbody* body_b = second_collider->user;
 
 			vec2 rel_vel = body_b->vel - body_a->vel;
-
-			float e = 1;
-			float impulse_magnitude = contact->n.dot(rel_vel);
+			float e = std::min(body_a->bounciness, body_b->bounciness);
+			float impulse_magnitude = (1 + e) * contact->n.dot(rel_vel) / (1/body_a->mass + 1/body_b->mass);
 			vec2 impulse = contact->n * impulse_magnitude;
 		
-			body_a->vel = body_a->vel + impulse;
-			body_b->vel = body_b->vel - impulse;
+			body_a->vel = body_a->vel + impulse / body_a->mass;
+			body_b->vel = body_b->vel - impulse / body_b->mass;
 		}
 	}
 };

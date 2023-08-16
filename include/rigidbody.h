@@ -13,6 +13,7 @@ struct Rigidbody {
     vec2 vel;
     vec2 acc = {};
     float mass;
+    float bounciness = 1;
 
     Rigidbody() : pos(vec2(0, 0)), vel(vec2(0, 0)), mass(1) {}
     Rigidbody(vec2 pos, vec2 vel = {0, 0}) : pos(pos), vel(vel), mass(1) {}
